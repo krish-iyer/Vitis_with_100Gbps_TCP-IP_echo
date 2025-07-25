@@ -46,20 +46,29 @@ module pkt_receiver (
     wire        notif_tx_TVALID;
     reg         notif_tx_TREADY;
 
-    nukv_fifogen #(
-        .DATA_SIZE(88),
-        .ADDR_BITS(12)
-    ) fifo_notif (
-        .clk(clk),
-        .rst(rst),
-        .s_axis_tvalid(s_axis_notifications_TVALID),
-        .s_axis_tready(s_axis_notifications_TREADY),
-        .s_axis_tdata(s_axis_notifications_TDATA),
-        .m_axis_tvalid(notif_tx_TVALID),
-        .m_axis_tready(notif_tx_TREADY),
-        .m_axis_tdata(notif_tx_TDATA)
+//    nukv_fifogen #(
+//        .DATA_SIZE(88),
+//        .ADDR_BITS(10)
+//    ) fifo_notif (
+//        .clk(clk),
+//        .rst(rst),
+//        .s_axis_tvalid(s_axis_notifications_TVALID),
+//        .s_axis_tready(s_axis_notifications_TREADY),
+//        .s_axis_tdata(s_axis_notifications_TDATA),
+//        .m_axis_tvalid(notif_tx_TVALID),
+//        .m_axis_tready(notif_tx_TREADY),
+//        .m_axis_tdata(notif_tx_TDATA)
+//    );
+    axis_data_fifo_88 fifo_notif (
+      .s_axis_aresetn(1'b1),  // input wire s_axis_aresetn
+      .s_axis_aclk(clk),        // input wire s_axis_aclk
+      .s_axis_tvalid(s_axis_notifications_TVALID),    // input wire s_axis_tvalid
+      .s_axis_tready(s_axis_notifications_TREADY),    // output wire s_axis_tready
+      .s_axis_tdata(s_axis_notifications_TDATA),      // input wire [87 : 0] s_axis_tdata
+      .m_axis_tvalid(notif_tx_TVALID),    // output wire m_axis_tvalid
+      .m_axis_tready(notif_tx_TREADY),    // input wire m_axis_tready
+      .m_axis_tdata(notif_tx_TDATA)      // output wire [87 : 0] m_axis_tdata
     );
-    
     /**********/    
 
     reg          payload_rx_TVALID;
@@ -77,21 +86,31 @@ module pkt_receiver (
         // signal should be only valid for 1 clock
         payload_rx_TVALID = s_axis_rx_data_TVALID & (~prev_rx_data_TVALID);
     end
-
-    nukv_fifogen #(
-        .DATA_SIZE(512 + 1), //tlast + tdata
-        .ADDR_BITS(12)
-    ) fifo_payload (
-        .clk(clk),
-        .rst(rst),
-        .s_axis_tvalid(s_axis_rx_data_TVALID),
-        .s_axis_tready(s_axis_rx_data_TREADY),
-        .s_axis_tdata(s_axis_rx_data_TDATA), //tlast + tdata
-        .m_axis_tvalid(payload_tx_TVALID),
-        .m_axis_tready(payload_tx_TREADY),
-        .m_axis_tdata(payload_tx_TDATA) //tlast + tdata
+    
+//   nukv_fifogen #(
+//        .DATA_SIZE(512 + 1), //tlast + tdata
+//        .ADDR_BITS(10)
+//    ) fifo_payload (
+//        .clk(clk),
+//        .rst(rst),
+//        .s_axis_tvalid(s_axis_rx_data_TVALID),
+//        .s_axis_tready(s_axis_rx_data_TREADY),
+//        .s_axis_tdata(s_axis_rx_data_TDATA), //tlast + tdata
+//        .m_axis_tvalid(payload_tx_TVALID),
+//        .m_axis_tready(payload_tx_TREADY),
+//        .m_axis_tdata(payload_tx_TDATA) //tlast + tdata
+//    );
+    axis_data_fifo_513 fifo_payload (
+      .s_axis_aresetn(1'b1),  // input wire s_axis_aresetn
+      .s_axis_aclk(clk),        // input wire s_axis_aclk
+      .s_axis_tvalid(s_axis_rx_data_TVALID),    // input wire s_axis_tvalid
+      .s_axis_tready(s_axis_rx_data_TREADY),    // output wire s_axis_tready
+      .s_axis_tdata({7'b0, s_axis_rx_data_TDATA}),      // input wire [519 : 0] s_axis_tdata
+      .m_axis_tvalid(payload_tx_TVALID),    // output wire m_axis_tvalid
+      .m_axis_tready(payload_tx_TREADY),    // input wire m_axis_tready
+      .m_axis_tdata(payload_tx_TDATA)      // output wire [519 : 0] m_axis_tdata
     );
-
+    
     /**********/
 
     reg          metadata_rx_TVALID;
@@ -100,28 +119,39 @@ module pkt_receiver (
     wire [87:0]  metadata_tx_TDATA;
     wire         metadata_tx_TVALID;
     reg          metadata_tx_TREADY = 0;
-
-    nukv_fifogen #(
-        .DATA_SIZE(88),
-        .ADDR_BITS(12)
-    ) fifo_metadata (
-        .clk(clk),
-        .rst(rst),
-        .s_axis_tvalid(metadata_rx_TVALID),
-        .s_axis_tready(metadata_rx_TREADY),
-        .s_axis_tdata(notif_tx_TDATA),
-        .m_axis_tvalid(metadata_tx_TVALID),
-        .m_axis_tready(metadata_tx_TREADY),
-        .m_axis_tdata(metadata_tx_TDATA)
-    );    
     
+
+//    nukv_fifogen #(
+//        .DATA_SIZE(88),
+//        .ADDR_BITS(10)
+//    ) fifo_metadata (
+//        .clk(clk),
+//        .rst(rst),
+//        .s_axis_tvalid(metadata_rx_TVALID),
+//        .s_axis_tready(metadata_rx_TREADY),
+//        .s_axis_tdata(notif_tx_TDATA),
+//        .m_axis_tvalid(metadata_tx_TVALID),
+//        .m_axis_tready(metadata_tx_TREADY),
+//        .m_axis_tdata(metadata_tx_TDATA)
+//    );    
+    axis_data_fifo_88 fifo_metadata (
+      .s_axis_aresetn(1'b1),  // input wire s_axis_aresetn
+      .s_axis_aclk(clk),        // input wire s_axis_aclk
+      .s_axis_tvalid(metadata_rx_TVALID),    // input wire s_axis_tvalid
+      .s_axis_tready(metadata_rx_TREADY),    // output wire s_axis_tready
+      .s_axis_tdata(notif_tx_TDATA),      // input wire [87 : 0] s_axis_tdata
+      .m_axis_tvalid(metadata_tx_TVALID),    // output wire m_axis_tvalid
+      .m_axis_tready(metadata_tx_TREADY),    // input wire m_axis_tready
+      .m_axis_tdata(metadata_tx_TDATA)      // output wire [87 : 0] m_axis_tdata
+    );
 
 
     /**********/
 
     always @(*) begin
         m_axis_read_package_TDATA = notif_tx_TDATA[31:0];
-	if (notif_tx_TVALID == 1'b1 && (notif_tx_TDATA[31:16] % 64 != 0 || notif_tx_TDATA[31:16] < 16'd64 || notif_tx_TDATA[31:16] > 16'd4096)) begin
+    if (notif_tx_TVALID == 1'b1 && 
+        (notif_tx_TDATA[31:16] % 64 != 0 || notif_tx_TDATA[31:16] < 16'd64 || notif_tx_TDATA[31:16] > 16'd8960)) begin
             // discard rx_data that are larger than 1536B
             // also handle conn_close notification (msg size = 0)
             notif_tx_TREADY = 1'b1;

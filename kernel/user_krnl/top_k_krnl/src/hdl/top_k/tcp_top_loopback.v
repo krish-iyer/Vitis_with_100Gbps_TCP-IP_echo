@@ -141,14 +141,27 @@ module tcp_top_loopback #(parameter IS_SIM = 0)
         .pkt_tx_TVALID(pkt_TVALID),
         .pkt_tx_TREADY(pkt_TREADY)
     );
-
-    //assign pkt_new_TDATA = {pkt_TDATA[512+32-1:88], pkt_TDATA[512+88-1:512]};
+    
+//    wire [512+32-1 + 1: 0] pkt_TDATA_int;
+//    wire pkt_TVALID_int;
+//    wire pkt_TREADY_int;
+    
+    
+//    pkt_logic pkt_logic_inst(
+//        .clk(clk),
+//        .rst(reset),
+//        .pkt_rx_TDATA(pkt_TDATA),
+//        .pkt_rx_TVALID(pkt_TVALID),
+//        .pkt_rx_TREADY(pkt_TREADY),
+//        .pkt_tx_TDATA(pkt_TDATA_int),
+//        .pkt_tx_TVALID(pkt_TVALID_int),
+//        .pkt_tx_TREADY(pkt_TREADY_int)
+//    );
 
     pkt_sender pkt_sender_inst(
         .clk(clk),
         .rst(reset),
-        .pkt_rx_TDATA({pkt_TDATA[512+32-1 + 1: 0]}), //size + metadata + tlast + tdata
-        //.pkt_rx_TVALID(pkt_TVALID & pkt_TDATA[512]),
+        .pkt_rx_TDATA(pkt_TDATA), //metadata + tlast + tdata
         .pkt_rx_TVALID(pkt_TVALID),
         .pkt_rx_TREADY(pkt_TREADY),
         .s_axis_tx_status_TDATA(s_axis_tx_status_TDATA),
