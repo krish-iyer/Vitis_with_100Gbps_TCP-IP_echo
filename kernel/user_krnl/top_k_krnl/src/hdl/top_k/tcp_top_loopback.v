@@ -90,7 +90,6 @@ module tcp_top_loopback #(parameter IS_SIM = 0)
 
     assign clk = aclk;
 
-
     assign m_axis_listen_port_TDATA  = axis_listen_port_data;
     assign m_axis_listen_port_TVALID = axis_listen_port_valid;
 
@@ -166,7 +165,7 @@ module tcp_top_loopback #(parameter IS_SIM = 0)
         .pkt_rx_TREADY(pkt_TREADY),
         .s_axis_tx_status_TDATA(s_axis_tx_status_TDATA),
         .s_axis_tx_status_TVALID(s_axis_tx_status_TVALID),
-        .s_axis_tx_status_TREADY(s_axis_tx_status_TREADY),
+        .s_axis_tx_status_TREADY(),
         .m_axis_tx_metadata_TDATA(m_axis_tx_metadata_TDATA),
         .m_axis_tx_metadata_TVALID(m_axis_tx_metadata_TVALID),
         .m_axis_tx_metadata_TREADY(m_axis_tx_metadata_TREADY),

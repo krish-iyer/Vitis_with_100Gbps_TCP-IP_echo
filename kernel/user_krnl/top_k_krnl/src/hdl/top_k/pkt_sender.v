@@ -116,7 +116,7 @@ module pkt_sender (
         .clk(clk),
         .rst(rst),
         .s_axis_tvalid(payload_rx_TVALID && pkt_rx_TDATA[512]),
-        .s_axis_tready(metadata_rx_TREADY),
+        .s_axis_tready(),
         .s_axis_tdata(size_metadata),
         .m_axis_tvalid(m_axis_tx_metadata_TVALID),
         .m_axis_tready(m_axis_tx_metadata_TREADY),
