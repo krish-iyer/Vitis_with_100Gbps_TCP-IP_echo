@@ -107,7 +107,7 @@ module pkt_sender (
 
     //reg [31:0]  metadata_rx_TDATA;//original 16-bit
     reg         metadata_rx_TVALID;
-    wire        metadata_rx_TREADY = 1;
+    //wire        metadata_rx_TREADY = 1;
     
     nukv_fifogen #(
         .DATA_SIZE(32),
@@ -116,7 +116,7 @@ module pkt_sender (
         .clk(clk),
         .rst(rst),
         .s_axis_tvalid(payload_rx_TVALID && pkt_rx_TDATA[512]),
-        .s_axis_tready(),
+        .s_axis_tready(metadata_rx_TREADY),
         .s_axis_tdata(size_metadata),
         .m_axis_tvalid(m_axis_tx_metadata_TVALID),
         .m_axis_tready(m_axis_tx_metadata_TREADY),
