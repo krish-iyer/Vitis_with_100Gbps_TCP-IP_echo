@@ -40,33 +40,64 @@ wire pkt_out_TVALID;
 wire pkt_out_TREADY;
 
 
+//dispatcher dispatcher_inst(
+//    .clk(clk),
+//    .rx_TDATA(pkt_rx_TDATA),
+//    .rx_TVALID(pkt_rx_TVALID),
+//    .rx_TREADY(pkt_rx_TREADY),
+//    .tx_TDATA(pkt_out_TDATA),
+//    .tx_TVALID(pkt_out_TVALID),
+//    .tx_TREADY(pkt_out_TREADY)
+//    );
+
+///**scheduler**/
+//wire [512 + 32 + 16 :0] pkt_rx_TDATA_int;
+////wire [512 + 88 + 16 :0] pkt_rx_TDATA_int; //{tx_selection, rx_TDATA}
+//wire pkt_rx_TVALID_int;
+
+//scheduler scheduler_inst
+//(
+//    .clk(clk),
+//    .rx_TDATA( { pkt_out_TDATA[512 + 88 + 32: 512 + 88 + 1], pkt_out_TDATA[512 + 32: 0]}),
+//    .rx_TVALID(pkt_out_TVALID),
+//    .rx_TREADY(pkt_out_TREADY),
+//    .tx_TDATA(pkt_rx_TDATA_int),
+//    .tx_TVALID(pkt_rx_TVALID_int),
+//    .tx_TREADY(pkt_rx_TREADY_int)
+//);
+
+/**dispatcher**/
+
+wire [512 + 32 + 32 + 16: 0] pkt_out_TDATA;  //{packet_size, workload_selection,  session_ID, rx_TDATA}
+wire pkt_out_TVALID;
+wire pkt_out_TREADY;
+
+
 dispatcher dispatcher_inst(
     .clk(clk),
     .rx_TDATA(pkt_rx_TDATA),
     .rx_TVALID(pkt_rx_TVALID),
     .rx_TREADY(pkt_rx_TREADY),
-    .tx_TDATA(pkt_out_TDATA),
+    .tx_TDATA(pkt_out_TDATA),  
     .tx_TVALID(pkt_out_TVALID),
     .tx_TREADY(pkt_out_TREADY)
     );
 
 /**scheduler**/
-wire [512 + 32 + 16 :0] pkt_rx_TDATA_int;
+wire [512 + 32 + 16 :0] pkt_rx_TDATA_int; // {16-bit Workload_type. 32-bit ConnID, 512+1 payload}
 //wire [512 + 88 + 16 :0] pkt_rx_TDATA_int; //{tx_selection, rx_TDATA}
 wire pkt_rx_TVALID_int;
 
 scheduler scheduler_inst
 (
     .clk(clk),
-    .rx_TDATA( { pkt_out_TDATA[512 + 88 + 32: 512 + 88 + 1], pkt_out_TDATA[512 + 32: 0]}),
+    .rx_TDATA( pkt_out_TDATA),
     .rx_TVALID(pkt_out_TVALID),
     .rx_TREADY(pkt_out_TREADY),
     .tx_TDATA(pkt_rx_TDATA_int),
     .tx_TVALID(pkt_rx_TVALID_int),
     .tx_TREADY(pkt_rx_TREADY_int)
 );
-
-
 
 /*Workload modules*/
 
@@ -223,7 +254,7 @@ reg output_ready_echo_0, output_ready_echo_1, output_ready_echo_2;
 (
     .DEPTH(8),
     .KEEP_ENABLE(0),
-    .DATA_WIDTH(522),
+    .DATA_WIDTH(552),
     .USER_ENABLE(0),
     .RAM_PIPELINE(2)
 )
@@ -272,7 +303,7 @@ ECHO_FIFO_0
 (
     .DEPTH(8),
     .KEEP_ENABLE(0),
-    .DATA_WIDTH(522),
+    .DATA_WIDTH(552),
     .USER_ENABLE(0),
     .RAM_PIPELINE(2)
 )
@@ -322,7 +353,7 @@ ECHO_FIFO_1
 (
     .DEPTH(8),
     .KEEP_ENABLE(0),
-    .DATA_WIDTH(522),
+    .DATA_WIDTH(552),
     .USER_ENABLE(0),
     .RAM_PIPELINE(2)
 )
