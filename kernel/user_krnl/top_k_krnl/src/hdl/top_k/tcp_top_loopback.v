@@ -63,7 +63,7 @@ module tcp_top_loopback #(parameter IS_SIM = 0)
     assign m_axis_close_connection_TVALID   = 0;
     assign s_axis_listen_port_status_TREADY = 1;
     assign s_axis_rx_metadata_TREADY        = 1;
-    assign s_axis_tx_status_TREADY          = 1;
+    //assign s_axis_tx_status_TREADY          = 1;
 
     assign m_axis_open_connection_TVALID = 0;
     assign s_axis_open_status_TREADY     = 1;
@@ -147,8 +147,8 @@ module tcp_top_loopback #(parameter IS_SIM = 0)
     wire [512+32-1 + 1: 0] pkt_TDATA_int;
     wire pkt_TVALID_int;
     wire pkt_TREADY_int;
-    
-    
+
+
     pkt_logic pkt_logic_inst(
         .clk(clk),
         .rst(reset),
@@ -159,7 +159,7 @@ module tcp_top_loopback #(parameter IS_SIM = 0)
         .pkt_tx_TVALID(pkt_TVALID_int),
         .pkt_tx_TREADY(pkt_TREADY_int)
     );
-    
+
 
     pkt_sender pkt_sender_inst(
         .clk(clk),

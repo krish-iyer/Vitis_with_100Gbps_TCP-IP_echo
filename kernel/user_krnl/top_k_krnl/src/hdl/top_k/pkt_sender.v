@@ -18,7 +18,7 @@
 // Additional Comments:
 //
 //////////////////////////////////////////////////////////////////////////////////
- 
+
 module pkt_sender (
         input wire clk,
         input wire rst,
@@ -34,18 +34,18 @@ module pkt_sender (
         output wire [31:0]   m_axis_tx_metadata_TDATA,
         output wire          m_axis_tx_metadata_TVALID,
         input wire           m_axis_tx_metadata_TREADY,
-        
+
         output wire [511:0]  m_axis_tx_data_TDATA,
         output reg           m_axis_tx_data_TVALID,
         output reg [64:0] 	 m_axis_tx_data_TKEEP,
         output wire         	 m_axis_tx_data_TLAST,
-        input wire           m_axis_tx_data_TREADY        
-    ); 
+        input wire           m_axis_tx_data_TREADY
+    );
 
     wire status_tx_TVALID;
     reg  status_tx_TREADY;
     wire status_tx_TDATA;
-    
+
     //For debug
     wire [31:0] size_metadata;
     assign size_metadata = pkt_rx_TDATA[512 + 32: 512 + 1];
@@ -64,17 +64,17 @@ module pkt_sender (
         .m_axis_tready(status_tx_TREADY),
         .m_axis_tdata(status_tx_TDATA)
     );
-    
-    /**********/    
+
+    /**********/
     reg [511 + 1:0]  payload_rx_TDATA;
     reg          payload_rx_TVALID;
     wire         payload_rx_TREADY;
 
     wire         payload_tx_TVALID;
     reg          payload_tx_TREADY;
-    
+
     wire [512: 0] output_tx;
-    
+
 //    //FIFO for storing payload
 //    nukv_fifogen #(
 //        .DATA_SIZE(512 + 1), //tlast + tdata
@@ -89,17 +89,67 @@ module pkt_sender (
 //        .m_axis_tready(payload_tx_TREADY),
 //        .m_axis_tdata(output_tx)
 //    );
-    axis_data_fifo_513 fifo_payload (
-      .s_axis_aresetn(1'b1),  // input wire s_axis_aresetn
-      .s_axis_aclk(clk),        // input wire s_axis_aclk
-      .s_axis_tvalid(payload_rx_TVALID),    // input wire s_axis_tvalid
-      .s_axis_tready(payload_rx_TREADY),    // output wire s_axis_tready
-      .s_axis_tdata(payload_rx_TDATA),      // input wire [519 : 0] s_axis_tdata
-      .m_axis_tvalid(payload_tx_TVALID),    // output wire m_axis_tvalid
-      .m_axis_tready(payload_tx_TREADY),    // input wire m_axis_tready
-      .m_axis_tdata(output_tx)      // output wire [519 : 0] m_axis_tdata
-    );
-    
+    // axis_data_fifo_513 fifo_payload (
+    //   .s_axis_aresetn(1'b1),  // input wire s_axis_aresetn
+    //   .s_axis_aclk(clk),        // input wire s_axis_aclk
+    //   .s_axis_tvalid(payload_rx_TVALID),    // input wire s_axis_tvalid
+    //   .s_axis_tready(payload_rx_TREADY),    // output wire s_axis_tready
+    //   .s_axis_tdata(payload_rx_TDATA),      // input wire [519 : 0] s_axis_tdata
+    //   .m_axis_tvalid(payload_tx_TVALID),    // output wire m_axis_tvalid
+    //   .m_axis_tready(payload_tx_TREADY),    // input wire m_axis_tready
+    //   .m_axis_tdata(output_tx)      // output wire [519 : 0] m_axis_tdata
+    // );
+
+axis_fifo #
+(
+    .DEPTH(512),
+    .KEEP_ENABLE(0),
+    .DATA_WIDTH(520),
+    .USER_ENABLE(0),
+    .RAM_PIPELINE(5)
+)
+fifo_payload
+(
+    .clk(clk),
+    .rst(rst),
+    .s_axis_tdata(payload_rx_TDATA),
+    .s_axis_tkeep(),
+    .s_axis_tvalid(payload_rx_TVALID),
+    .s_axis_tready(payload_rx_TREADY),
+    .s_axis_tlast(),
+    .s_axis_tid(),
+    .s_axis_tdest(),
+    .s_axis_tuser(),
+
+    /*
+     * AXI output
+     */
+    .m_axis_tdata(output_tx),
+    .m_axis_tkeep(),
+    .m_axis_tvalid(payload_tx_TVALID),
+    .m_axis_tready(payload_tx_TREADY),
+    .m_axis_tlast(),
+    .m_axis_tid(),
+    .m_axis_tdest(),
+    .m_axis_tuser(),
+
+    /*
+     * Pause
+     */
+    .pause_req(),
+    .pause_ack(),
+
+    /*
+     * Status
+     */
+    .status_depth(),
+    .status_depth_commit(),
+    .status_overflow(),
+    .status_bad_frame(),
+    .status_good_frame()
+);
+
+
     assign m_axis_tx_data_TLAST = output_tx[512] && m_axis_tx_data_TVALID;
     assign m_axis_tx_data_TDATA = output_tx[511:0];
 
@@ -107,8 +157,8 @@ module pkt_sender (
 
     //reg [31:0]  metadata_rx_TDATA;//original 16-bit
     reg         metadata_rx_TVALID;
-    wire        metadata_rx_TREADY = 1;
-    
+    wire        metadata_rx_TREADY;
+
     nukv_fifogen #(
         .DATA_SIZE(32),
         .ADDR_BITS(8)
@@ -116,12 +166,12 @@ module pkt_sender (
         .clk(clk),
         .rst(rst),
         .s_axis_tvalid(payload_rx_TVALID && pkt_rx_TDATA[512]),
-        .s_axis_tready(),
+        .s_axis_tready(metadata_rx_TREADY),
         .s_axis_tdata(size_metadata),
         .m_axis_tvalid(m_axis_tx_metadata_TVALID),
         .m_axis_tready(m_axis_tx_metadata_TREADY),
         .m_axis_tdata(m_axis_tx_metadata_TDATA)
-    );   
+    );
     /**********/
 
 reg payload_tx_ready_hold = 0; // Register to hold the state of payload_tx_TREADY
@@ -144,7 +194,7 @@ always @(*) begin
     payload_rx_TVALID = pkt_rx_TREADY & pkt_rx_TVALID;
     m_axis_tx_data_TKEEP = 64'hFFFFFFFFFFFFFFFFF;
     //dataSize_metadata = previous_count * 16'd64;
-   
+
     if (status_tx_TVALID == 1'b1 && payload_tx_TVALID == 1'b1 && status_tx_TDATA == 1'b1) begin //Payload sent the same time as status
         // exception handler: sent to closed connection
         // discard payload and status
@@ -156,7 +206,7 @@ always @(*) begin
         status_tx_TREADY = m_axis_tx_data_TVALID_inst & m_axis_tx_data_TREADY;
         payload_tx_TREADY = payload_tx_ready_hold;
         m_axis_tx_data_TVALID = payload_tx_TVALID & payload_tx_TREADY;
-    end 
+    end
 end
 
 endmodule
