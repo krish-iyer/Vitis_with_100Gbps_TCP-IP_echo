@@ -100,11 +100,11 @@ module pkt_sender (
     //   .m_axis_tdata(output_tx)      // output wire [519 : 0] m_axis_tdata
     // );
 
-axis_fifo #
+axis_fifo_ultra #
 (
     .DEPTH(512),
     .KEEP_ENABLE(0),
-    .DATA_WIDTH(520),
+    .DATA_WIDTH(513),
     .USER_ENABLE(0),
     .RAM_PIPELINE(5)
 )

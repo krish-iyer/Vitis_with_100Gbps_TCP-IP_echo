@@ -110,11 +110,11 @@ module pkt_receiver (
     //   .m_axis_tready(payload_tx_TREADY),    // input wire m_axis_tready
     //   .m_axis_tdata(payload_tx_TDATA)      // output wire [519 : 0] m_axis_tdata
     // );
-axis_fifo #
+axis_fifo_ultra #
 (
     .DEPTH(512),
     .KEEP_ENABLE(0),
-    .DATA_WIDTH(520),
+    .DATA_WIDTH(513),
     .USER_ENABLE(0),
     .RAM_PIPELINE(5)
 )
@@ -122,7 +122,7 @@ fifo_payload
 (
     .clk(clk),
     .rst(rst),
-    .s_axis_tdata({7'b0, s_axis_rx_data_TDATA}),
+    .s_axis_tdata(s_axis_rx_data_TDATA),
     .s_axis_tkeep(),
     .s_axis_tvalid(s_axis_rx_data_TVALID),
     .s_axis_tready(s_axis_rx_data_TREADY),

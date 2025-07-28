@@ -35,9 +35,9 @@ module pkt_logic
 
 /**dispatcher**/
 
-wire [512 + 88 + 16 + 16: 0] pkt_out_TDATA;  // {packet_size,tx_selection, rx_TDATA}
-wire pkt_out_TVALID;
-wire pkt_out_TREADY;
+// wire [512 + 88 + 16 + 16: 0] pkt_out_TDATA;  // {packet_size,tx_selection, rx_TDATA}
+// wire pkt_out_TVALID;
+// wire pkt_out_TREADY;
 
 
 //dispatcher dispatcher_inst(
@@ -78,7 +78,7 @@ dispatcher dispatcher_inst(
     .rx_TDATA(pkt_rx_TDATA),
     .rx_TVALID(pkt_rx_TVALID),
     .rx_TREADY(pkt_rx_TREADY),
-    .tx_TDATA(pkt_out_TDATA),  
+    .tx_TDATA(pkt_out_TDATA),
     .tx_TVALID(pkt_out_TVALID),
     .tx_TREADY(pkt_out_TREADY)
     );
@@ -252,9 +252,9 @@ reg output_ready_echo_0, output_ready_echo_1, output_ready_echo_2;
 
  axis_fifo #
 (
-    .DEPTH(8),
+    .DEPTH(2),
     .KEEP_ENABLE(0),
-    .DATA_WIDTH(552),
+    .DATA_WIDTH(545),
     .USER_ENABLE(0),
     .RAM_PIPELINE(2)
 )
@@ -262,7 +262,7 @@ ECHO_FIFO_0
 (
     .clk(clk),
     .rst(0),
-    .s_axis_tdata({7'b0, meta_TDATA_out_echo_0_reg, pkt_tx_TDATA_payload_echo_0_reg}),
+    .s_axis_tdata({meta_TDATA_out_echo_0_reg, pkt_tx_TDATA_payload_echo_0_reg}),
     .s_axis_tkeep(),
     .s_axis_tvalid(pkt_tx_TVALID_result_FIFO_echo_0),
     .s_axis_tready(pkt_tx_TREADY_echo_0),
@@ -301,9 +301,9 @@ ECHO_FIFO_0
 
  axis_fifo #
 (
-    .DEPTH(8),
+    .DEPTH(2),
     .KEEP_ENABLE(0),
-    .DATA_WIDTH(552),
+    .DATA_WIDTH(545),
     .USER_ENABLE(0),
     .RAM_PIPELINE(2)
 )
@@ -311,7 +311,7 @@ ECHO_FIFO_1
 (
     .clk(clk),
     .rst(0),
-    .s_axis_tdata({7'b0, meta_TDATA_out_echo_1_reg, pkt_tx_TDATA_payload_echo_1_reg}),
+    .s_axis_tdata({meta_TDATA_out_echo_1_reg, pkt_tx_TDATA_payload_echo_1_reg}),
     .s_axis_tkeep(),
     .s_axis_tvalid(pkt_tx_TVALID_result_FIFO_echo_1),
     .s_axis_tready(pkt_tx_TREADY_echo_1),
@@ -351,9 +351,9 @@ ECHO_FIFO_1
 
  axis_fifo #
 (
-    .DEPTH(8),
+    .DEPTH(2),
     .KEEP_ENABLE(0),
-    .DATA_WIDTH(552),
+    .DATA_WIDTH(545),
     .USER_ENABLE(0),
     .RAM_PIPELINE(2)
 )
@@ -361,7 +361,7 @@ ECHO_FIFO_2
 (
     .clk(clk),
     .rst(0),
-    .s_axis_tdata({7'b0, meta_TDATA_out_echo_2_reg, pkt_tx_TDATA_payload_echo_2_reg}),
+    .s_axis_tdata({meta_TDATA_out_echo_2_reg, pkt_tx_TDATA_payload_echo_2_reg}),
     .s_axis_tkeep(),
     .s_axis_tvalid(pkt_tx_TVALID_result_FIFO_echo_2),
     .s_axis_tready(pkt_tx_TREADY_echo_2),
